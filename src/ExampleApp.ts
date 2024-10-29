@@ -38,12 +38,32 @@ export class ExampleApp extends gfx.GfxApp
         const axes = gfx.Geometry3Factory.createAxes(2);
         this.scene.add(axes);
 
-        this.myCylinder = gfx.Geometry3Factory.createCylinder(20, 0.1, 1);
+        this.myCylinder = gfx.Geometry3Factory.createCylinder(20, 1, 1);
         this.myCylinder.material.setColor(new gfx.Color(1, 1, 0.7));
         this.scene.add(this.myCylinder);
 
+        const boneLength = 2.0;
+
         // How do I set myClinder's localToParent matrix to make it align with some arbitrary axis?
         const axisVec = new gfx.Vector3(1,1,1);
+
+        const S = gfx.Matrix4.makeScale(new gfx.Vector3(0.1, boneLength, 0.1));
+        const T = gfx.Matrix4.makeTranslation(new gfx.Vector3(0,0.5 * boneLength, 0));
+
+        // approach #1
+        // const R = gfx.Matrix4.makeRotationX(-Math.PI/2);
+        // const startPt = gfx.Vector3.ZERO;
+        // const targetPt = gfx.Vector3.add(startPt, axisVec);
+        // const R2 = gfx.Matrix4.lookAt(startPt, targetPt, gfx.Vector3.UP);
+        // const Mfinal = gfx.Matrix4.multiplyAll(R2, R, T, S);
+
+        // approach #2 (using makeAlign)
+        const R = gfx.Matrix4.makeAlign(gfx.Vector3.UP, axisVec);
+        const Mfinal = gfx.Matrix4.multiplyAll(R, T, S);
+        
+        this.myCylinder.setLocalToParentMatrix(Mfinal, false);
+
+        
 
     }
 
